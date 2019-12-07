@@ -84,11 +84,46 @@ public class EmployeeServiceTest {
     }
 
     @Test
+    public void setManagerNullE() {
+        Employee e = new Employee("Jimmy", "Johns", "Peon", "12345678", "jim@aol.com");
+        Employee m = new Employee("Jimmy2", "Johns2", "Jefe", "87654321", "joe@aol.com");
+        e.setId(4);
+        m.setId(7);
+        doReturn(e).when(employeeRepository).findOne(4);
+        doReturn(m).when(employeeRepository).findOne(7);
+        employeeService.setManager(3,7);
+        verify(employeeRepository, times(0)).save(e);
+        Assert.assertNull(employeeService.setManager(3,7));
+    }
+
+    @Test
     public void updateEmployee() {
         Employee e = new Employee("Jimmy", "Johns", "Peon", "12345678", "jim@aol.com");
         employeeService.updateEmployee(e);
         verify(employeeRepository, times(1)).save(e);
     }
+
+    @Test
+    public void getEmployeesManagedBy () {
+        when(employeeService.getEmployeesManagedBy(7)).thenReturn(stubEmployees());
+        employeeService.getEmployeesManagedBy(7);
+        verify(employeeRepository, times(1)).findEmployeeByManagerId(7);
+    }
+
+    @Test
+    public void getEmployeesOfDepartment () {
+        when(employeeService.getEmployeesOfDepartment(7)).thenReturn(stubEmployees());
+        employeeService.getEmployeesOfDepartment(7);
+        verify(employeeRepository, times(1)).findEmployeeByDepartmentNum(7);
+    }
+
+    @Test
+    public void getEmployeesNoManager () {
+        when(employeeService.getEmployeesNoManager()).thenReturn(stubEmployees());
+        employeeService.getEmployeesNoManager();
+        verify(employeeRepository, times(1)).findEmployeeByManagerIsNull();
+    }
+
 
 
 
