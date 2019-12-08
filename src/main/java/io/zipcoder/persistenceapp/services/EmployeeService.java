@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -47,9 +48,11 @@ public class EmployeeService {
                 List<Employee> nextBatch = new ArrayList<>();
                 for (Employee e: toBeDeleted) {
                     nextBatch.addAll((List<Employee>) getEmployeesManagedBy(e.getId()));
+                    nextBatch.stream().forEach(em -> em.setManager(null));
                     employeeRepository.delete(e);
-                    toBeDeleted.remove(e);
                 }
+                toBeDeleted.clear();
+                toBeDeleted.addAll(nextBatch);
             }
         }
     }
@@ -62,8 +65,12 @@ public class EmployeeService {
             Iterable<Employee> employees = getEmployeesManagedBy(managerId);
 
             for (Employee e: employees) { // loop through, remapping them
-                e.setManager(nextManager);
+                for (Employee ee : employeeRepository.findEmployeeByManagerId(e.getId())) {
+                    ee.setManager(nextManager);
+                }
+                deleteEmployee(e.getId());
             }
+            deleteEmployee(managerId);
         }
     }
 
