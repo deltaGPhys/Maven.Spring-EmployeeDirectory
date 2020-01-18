@@ -9,7 +9,7 @@ public class Department {
     @GeneratedValue
     private int id;
     private String name;
-    @ManyToOne
+    @OneToOne
     private Employee manager;
 
     public int getId() {
